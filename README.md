@@ -126,6 +126,7 @@ only). It contains the ALSA plugin and wled-audiosync. After installing, open it
 | Target address | the IPv4 address of the WLED controller, or the multicast group 239.0.0.1 (default) |
 | Gain | gain of wled-audiosync, default 1.0 |
 
+Restart Kodi once after installing it: a running Kodi does not see the new audio device.
 The add-on creates the audio device `hdmi_leadtap` (shown in Kodi as "Audio with early
 copy (leadtap)") and the pipes `/tmp/leadtap.fifo` (for Snapcast) and
 `/tmp/leadtap-sync.fifo` (read by the bundled wled-audiosync). Change the lead only while
