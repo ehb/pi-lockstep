@@ -1,7 +1,7 @@
 name: repository
 
 # Publishes the Kodi add-on repository on GitHub Pages from the newest Releases of the projects.
-# Runs after the daily LibreELEC check of rpi-gpio-spdif. GitHub disables schedules after 60 days
+# Runs daily, so new releases of the projects show up. GitHub disables schedules after 60 days
 # without activity, so the keepalive job re-enables this workflow on every run.
 on:
   schedule:

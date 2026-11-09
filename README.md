@@ -52,12 +52,12 @@ its separate passthrough device (the copy is silent for such streams anyway).
 
 | Project | What it is | Useful on its own for |
 |---|---|---|
-| [rpi-gpio-spdif](https://github.com/ehb/rpi-gpio-spdif) | Kernel driver and LibreELEC add-on: S/PDIF output on GPIO21 (Raspberry Pi 0-4), PCM and AC3/DTS passthrough | Getting digital audio out of a Pi without a HAT |
+| [rpi-gpio-spdif](https://github.com/ehb/rpi-gpio-spdif) | ALSA plugin and Kodi add-on: S/PDIF output on GPIO21 (Raspberry Pi 0-4), PCM and AC3/DTS passthrough, no kernel driver | Getting digital audio out of a Pi without a HAT |
 | [alsa-leadtap](https://github.com/ehb/alsa-leadtap) | ALSA plugin: passes audio to any sound card unchanged and writes a copy to a pipe a fixed time before it is audible | Anything that wants an early copy of what a player outputs: multiroom, visualisers, recording |
 | [wled-audiosync](https://github.com/ehb/wled-audiosync) | Reads audio from a pipe and sends it to WLED as Audio Sync V2 (frequency bands, volume, beat), held back to match the sound | Sound-reactive WLED effects from any Linux audio source, no microphone |
 | [tvlight](https://github.com/ehb/tvlight) | Kodi service add-on: edge colours of the picture to WLED over DDP | TV-reactive light on a Pi 4 with LibreELEC, no grabber |
 
-They work independently: the S/PDIF driver does not need the plugin, the plugin works in
+They work independently: the S/PDIF output does not need the lead plugin, the plugin works in
 front of HDMI or any other card, wled-audiosync takes any pipe, and tvlight touches no audio
 at all. They share a convention (48 kHz, 16 bit, stereo copy; one `lead` time) so that they
 line up when combined.
@@ -76,7 +76,7 @@ For everything:
 For optical S/PDIF:
 
 - A TOSLINK transmitter module (data, Vcc, GND). Data to GPIO21 (header pin 40), Vcc to 5 V
-  (pin 2 or 4, check the module), GND to pin 6. The driver uses the Pi's I2S block, so no
+  (pin 2 or 4, check the module), GND to pin 6. The S/PDIF output uses the Pi's I2S block, so no
   I2S DAC/HAT at the same time. Details, coax variants and a 100 nF tip in the
   rpi-gpio-spdif README.
 
@@ -93,23 +93,23 @@ For other rooms:
 
 ## Recipe
 
-The main path installs three Kodi add-ons. Two come from an add-on repository, so Kodi keeps
-them up to date; the S/PDIF driver is tied to the kernel and comes as a zip. You need no compiler and no shell on the Pi apart from the Snapcast step.
+The main path installs three Kodi add-ons, all from an add-on repository, so Kodi keeps
+them up to date. You need no compiler and no shell on the Pi apart from the Snapcast step.
 
 In Kodi, allow add-ons from zip files once (Settings -> System -> Add-ons -> Unknown
 sources). Download [repository.ehb-1.0.0.zip](https://ehb.github.io/pi-lockstep/repository.ehb-1.0.0.zip),
 copy it to the Pi (for example into LibreELEC's `Downloads` share) and use Add-ons -> Install
-from zip file. Then install alsa-leadtap and tvlight below with Add-ons -> Install from
+from zip file. Then install rpi-gpio-spdif, alsa-leadtap and tvlight below with Add-ons -> Install from
 repository -> pi-lockstep add-ons. All zips are also on the Releases page of each project.
 
-### 1. Sound card: driver.audio.rpi-gpio-spdif
+### 1. Optical S/PDIF: service.rpi-gpio-spdif
 
-Download `driver.audio.rpi-gpio-spdif-<LibreELEC version>.<revision>.zip` from
-[rpi-gpio-spdif Releases](https://github.com/ehb/rpi-gpio-spdif/releases) and install it from
-the zip file. The zip must match your **exact** LibreELEC version (the kernel module only
-loads into the kernel it was built for). Zips exist only for the LibreELEC **RPi4 (aarch64)
-image**. After a LibreELEC update, install the zip for the new version. The add-on writes its own ALSA configuration;
-the card appears as `iec958:CARD=SPDIFout,DEV=0`.
+Install it from the repository (64-bit Raspberry Pi only). It contains an ALSA plugin; there
+is no kernel module and no zip per LibreELEC version, so a LibreELEC update does not break
+it. It applies the stock overlay `hifiberry-dac`, writes its own ALSA configuration and
+provides the audio device `hdmi_bmc` (shown in Kodi as "S/PDIF on GPIO21"). Restart Kodi once
+after installing it. Its only setting, the extra buffer (default 80 ms), is what step 2 needs
+as head start; leave it unless you know better.
 
 Without S/PDIF (HDMI or another card), skip this step and give that card in step 2.
 
@@ -121,7 +121,7 @@ wled-audiosync. After installing, open its settings
 
 | Setting | What to enter |
 |---|---|
-| Sound card (ALSA device) | the card that plays the sound; default `iec958:CARD=SPDIFout,DEV=0` is the S/PDIF card of step 1; for HDMI for example `hdmi:CARD=vc4hdmi0,DEV=0` (see `aplay -L`) |
+| Sound card (ALSA device) | the device that plays the sound; the default `hdmi_bmc` is the S/PDIF device of step 1, **with HDMI or another card it must be changed**, for HDMI for example `hdmi:CARD=vc4hdmi0,DEV=0` (see `aplay -L`) |
 | Lead of the copy (ms) | how long before it is audible the copy is written, default 180 |
 | Send audio sync to WLED | on, to run the bundled wled-audiosync (step 4) |
 | Target address | the IPv4 address of the WLED controller, or the multicast group 239.0.0.1 (default) |
@@ -129,8 +129,8 @@ wled-audiosync. After installing, open its settings
 
 Restart Kodi once after installing it: a running Kodi does not see the new audio device.
 The add-on creates the audio device `hdmi_leadtap` (shown in Kodi as "Audio with early
-copy (leadtap)") and the pipes `/tmp/leadtap.fifo` (for Snapcast) and
-`/tmp/leadtap-sync.fifo` (read by the bundled wled-audiosync). Change the lead only while
+copy (leadtap)"). The pipes `/tmp/leadtap.fifo` (for Snapcast) and `/tmp/leadtap-sync.fifo`
+(for the bundled wled-audiosync) are created by their readers. Change the lead only while
 nothing is playing.
 
 ### 3. Snapcast server
@@ -165,7 +165,7 @@ Settings -> System -> Audio:
 
 - **Audio output device:** "Audio with early copy (leadtap)", i.e. `hdmi_leadtap`.
   Ordinary PCM from Kodi goes through the plugin.
-- **Passthrough output device:** the card itself, here `iec958:CARD=SPDIFout,DEV=0` (HDMI:
+- **Passthrough output device:** the device itself, here `hdmi_bmc` (HDMI:
   `hdmi:CARD=...`). Kodi only offers passthrough on devices named `iec958`, `spdif` or
   `hdmi`; `hdmi_leadtap` carries no passthrough. AC3/DTS passthrough goes directly to the
   card, without a copy.
@@ -195,7 +195,7 @@ pcm_type.leadtap {
 
 pcm.spdif_early {
     type leadtap
-    slave.pcm "iec958:CARD=SPDIFout"       # your sound card, or hdmi:CARD=...
+    slave.pcm "hdmi_bmc"                   # your sound device, or hdmi:CARD=...
     lead 180                               # ms the copy is ahead of the sound
     fifo [ "/tmp/leadtap.fifo" "/tmp/leadtap-sync.fifo" ]
     hint {
@@ -218,8 +218,8 @@ wled-audiosync --pipe /tmp/leadtap-sync.fifo --lead-ms 180 --target <address of 
 ```
 
   `--lead-ms` is the plugin's `lead`.
-- The S/PDIF driver without the add-on: see the rpi-gpio-spdif README (build, load, ALSA
-  setup).
+- The S/PDIF plugin without the add-on: see the rpi-gpio-spdif README (tarball, overlay,
+  ALSA setup).
 - Snapcast and tvlight as in steps 3 and 5.
 
 ## Status
@@ -228,16 +228,17 @@ Honest summary: this runs at the author's home, on **one** Raspberry Pi 4 with L
 12.2.1, and has been tested nowhere else.
 
 - Measured: with a 130 ms Snapcast buffer, a second room (client on Wi-Fi) played about
-  16 ms early against the sound at the Pi, with the same value within a few ms over
-  several runs. Everything else was judged by ear and eye.
+  20 ms early against the sound at the Pi (12 to 25 ms over several runs, no drift over two
+  hours). Everything else was judged by ear and eye.
 - Not tested: other Raspberry Pi models, other LibreELEC or Kodi versions, other receivers,
-  Kodi with HDMI behind the plugin (only checked with `aplay`), USB or `dmix` slaves, other
+  Kodi with HDMI behind the plugin (only checked with `aplay`), S/PDIF on any other Pi model, USB or `dmix` slaves, other
   WLED versions and builds, other sources for wled-audiosync's pipe, HDR video for
   tvlight, long unattended runs of the whole chain, installing the add-on zips through
   Kodi's user interface on a clean system.
-- The kernel module only loads into the exact kernel it was built for, so the S/PDIF
-  add-on is built per LibreELEC version. After a LibreELEC update there is no S/PDIF
-  output until a matching add-on is installed.
+- The S/PDIF plugin has limits of its own: no `dmix` (one program at a time on the
+  output), no keep-alive outside Kodi, the device name has to begin with `hdmi_` for
+  passthrough, and the Pi 5 is untested. The kernel driver version (rpi-gpio-spdif
+  tag v0.1.0) is the alternative if you need a real sound card.
 - The add-ons have likewise been run only on that one Pi.
 - Latency numbers depend on the player and the slave card; measure your own setup. A TV or
   receiver adds delay that no driver reports.

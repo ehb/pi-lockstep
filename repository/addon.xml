@@ -8,8 +8,8 @@
     </dir>
   </extension>
   <extension point="xbmc.addon.metadata">
-    <summary lang="en_GB">Updates for alsa-leadtap and tvlight</summary>
-    <description lang="en_GB">Kodi add-on repository of the pi-lockstep projects: a lip-synced audio copy for other rooms and sound-reactive light, and ambient light from the screen edges.</description>
+    <summary lang="en_GB">Updates for rpi-gpio-spdif, alsa-leadtap and tvlight</summary>
+    <description lang="en_GB">Kodi add-on repository of the pi-lockstep projects: optical S/PDIF out of a Raspberry Pi GPIO, a lip-synced audio copy for other rooms and sound-reactive light, and ambient light from the screen edges.</description>
     <platform>all</platform>
     <license>MIT</license>
     <source>https://github.com/ehb/pi-lockstep</source>

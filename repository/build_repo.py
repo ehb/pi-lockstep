@@ -17,6 +17,7 @@ import zipfile
 HERE = os.path.dirname(os.path.abspath(__file__))
 OWNER = "ehb"
 PROJECTS = {
+    "rpi-gpio-spdif": "service.rpi-gpio-spdif",
     "alsa-leadtap": "service.alsa-leadtap",
     "tvlight": "service.tvlight",
 }
