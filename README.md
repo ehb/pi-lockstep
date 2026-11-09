@@ -93,29 +93,30 @@ For other rooms:
 
 ## Recipe
 
-The main path installs three Kodi add-ons, each from the Releases page of its project.
-You need no compiler and no shell on the Pi apart from the Snapcast step.
+The main path installs three Kodi add-ons. Two come from an add-on repository, so Kodi keeps
+them up to date; the S/PDIF driver is tied to the kernel and comes as a zip. You need no compiler and no shell on the Pi apart from the Snapcast step.
 
 In Kodi, allow add-ons from zip files once (Settings -> System -> Add-ons -> Unknown
-sources). Then install each zip with Add-ons -> Install from zip file (copy the zips to the
-Pi first, for example into LibreELEC's `Downloads` share).
+sources). Download [repository.ehb-1.0.0.zip](https://ehb.github.io/pi-lockstep/repository.ehb-1.0.0.zip),
+copy it to the Pi (for example into LibreELEC's `Downloads` share) and use Add-ons -> Install
+from zip file. Then install alsa-leadtap and tvlight below with Add-ons -> Install from
+repository -> pi-lockstep add-ons. All zips are also on the Releases page of each project.
 
 ### 1. Sound card: driver.audio.rpi-gpio-spdif
 
 Download `driver.audio.rpi-gpio-spdif-<LibreELEC version>.<revision>.zip` from
-[rpi-gpio-spdif Releases](https://github.com/ehb/rpi-gpio-spdif/releases). The zip must
-match your **exact** LibreELEC version (the kernel module only loads into the kernel it was
-built for). Zips exist only for the LibreELEC **RPi4 (aarch64) image**. After a LibreELEC
-update, install the zip for the new version. The add-on writes its own ALSA configuration;
+[rpi-gpio-spdif Releases](https://github.com/ehb/rpi-gpio-spdif/releases) and install it from
+the zip file. The zip must match your **exact** LibreELEC version (the kernel module only
+loads into the kernel it was built for). Zips exist only for the LibreELEC **RPi4 (aarch64)
+image**. After a LibreELEC update, install the zip for the new version. The add-on writes its own ALSA configuration;
 the card appears as `iec958:CARD=SPDIFout,DEV=0`.
 
 Without S/PDIF (HDMI or another card), skip this step and give that card in step 2.
 
 ### 2. The plugin in front of the card: service.alsa-leadtap
 
-Download `service.alsa-leadtap-<version>.zip` from
-[alsa-leadtap Releases](https://github.com/ehb/alsa-leadtap/releases) (64-bit Raspberry Pi
-only). It contains the ALSA plugin and wled-audiosync. After installing, open its settings
+Install it from the repository (64-bit Raspberry Pi only). It contains the ALSA plugin and
+wled-audiosync. After installing, open its settings
 (Add-ons -> My add-ons -> Services -> alsa-leadtap -> Configure):
 
 | Setting | What to enter |
@@ -154,8 +155,7 @@ Audio Sync, mode Receive, port 11988, then choose a sound-reactive effect.
 
 ### 5. Light that follows the picture: service.tvlight
 
-Download `service.tvlight-<version>.zip` from
-[tvlight Releases](https://github.com/ehb/tvlight/releases), install it, enter the WLED
+Install it from the repository, enter the WLED
 address and the number of LEDs per edge in its settings. It is active during fullscreen
 video and the music visualisation.
 

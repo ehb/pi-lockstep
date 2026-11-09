@@ -1,0 +1,57 @@
+name: repository
+
+# Publishes the Kodi add-on repository on GitHub Pages from the newest Releases of the projects.
+# Runs after the daily LibreELEC check of rpi-gpio-spdif. GitHub disables schedules after 60 days
+# without activity, so the keepalive job re-enables this workflow on every run.
+on:
+  schedule:
+    - cron: "47 6 * * *"
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Build the repository
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: python3 repository/build_repo.py --out site
+      - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
+        with:
+          path: site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-24.04
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1
+
+  keepalive:
+    if: github.event_name == 'schedule'
+    runs-on: ubuntu-24.04
+    permissions:
+      actions: write
+    steps:
+      - name: Re-enable this workflow so the schedule does not lapse
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: gh api -X PUT "repos/$GH_REPO/actions/workflows/repository.yml/enable"

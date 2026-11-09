@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<addon id="repository.ehb" name="pi-lockstep add-ons" version="1.0.0" provider-name="ehb">
+  <extension point="xbmc.addon.repository" name="pi-lockstep add-ons">
+    <dir>
+      <info compressed="false">https://ehb.github.io/pi-lockstep/addons.xml</info>
+      <checksum>https://ehb.github.io/pi-lockstep/addons.xml.md5</checksum>
+      <datadir zip="true">https://ehb.github.io/pi-lockstep/</datadir>
+    </dir>
+  </extension>
+  <extension point="xbmc.addon.metadata">
+    <summary lang="en_GB">Updates for alsa-leadtap and tvlight</summary>
+    <description lang="en_GB">Kodi add-on repository of the pi-lockstep projects: a lip-synced audio copy for other rooms and sound-reactive light, and ambient light from the screen edges.</description>
+    <platform>all</platform>
+    <license>MIT</license>
+    <source>https://github.com/ehb/pi-lockstep</source>
+  </extension>
+</addon>
