@@ -168,7 +168,8 @@ Settings -> System -> Audio:
 - **Passthrough output device:** the device itself, here `hdmi_bmc` (HDMI:
   `hdmi:CARD=...`). Kodi only offers passthrough on devices named `iec958`, `spdif` or
   `hdmi`; `hdmi_leadtap` carries no passthrough. AC3/DTS passthrough goes directly to the
-  card, without a copy.
+  card, without a copy. Leave E-AC3, TrueHD and DTS-HD passthrough off: Kodi offers them for an
+  `hdmi` device, but they do not fit through S/PDIF.
 - **Speakers configuration 2.0**, with *Dolby Digital (AC3) transcoding* enabled if the
   receiver should get surround from sources Kodi cannot pass through (AAC 5.1 and similar).
   Kodi then encodes AC3 and sends it to the passthrough device. Other rooms and the
