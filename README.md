@@ -106,8 +106,9 @@ repository -> pi-lockstep add-ons. All zips are also on the Releases page of eac
 
 Install it from the repository (64-bit Raspberry Pi only). It contains an ALSA plugin; there
 is no kernel module and no zip per LibreELEC version, so a LibreELEC update does not break
-it. It applies the stock overlay `hifiberry-dac`, writes its own ALSA configuration and
-provides the audio device `hdmi_bmc` (shown in Kodi as "S/PDIF on GPIO21"). Restart Kodi once
+it. It applies its own small overlay (only GPIO21; falls back to the stock `hifiberry-dac`
+where that does not apply), writes its own ALSA configuration and provides the audio device
+`hdmi_bmc` (shown in Kodi as "S/PDIF on GPIO21"). Restart Kodi once
 after installing it. Its only setting, the extra buffer (default 80 ms), is what step 2 needs
 as head start; leave it unless you know better.
 
