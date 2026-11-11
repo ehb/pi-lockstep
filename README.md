@@ -239,7 +239,8 @@ Honest summary: this runs at the author's home, on **one** Raspberry Pi 4 with L
   Kodi's user interface on a clean system.
 - The S/PDIF plugin has limits of its own: no `dmix` (one program at a time on the
   output), no keep-alive outside Kodi, the device name has to begin with `hdmi_` for
-  passthrough, and the Pi 5 is untested. The kernel driver version (rpi-gpio-spdif
+  passthrough, and on the Pi 5 only its overlay has run (by a Raspberry Pi engineer, together
+  with a Pi 2). The kernel driver version (rpi-gpio-spdif
   tag v0.1.0) is the alternative if you need a real sound card.
 - The add-ons have likewise been run only on that one Pi.
 - Latency numbers depend on the player and the slave card; measure your own setup. A TV or
